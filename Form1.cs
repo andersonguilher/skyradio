@@ -25,8 +25,9 @@ namespace SkyRadio
         private WaveOutEvent _waveOut;
         private BufferedWaveProvider _playbackBuffer;
         private bool _isPttActive = false;
+        private bool _isInitialDataSent = false; // Flag para controlar o envio dos dados iniciais
         private Keys _pttKey = Keys.Space; // Tecla PTT (padrão: Espaço)
-        private const string RADIO_SERVER_URL = "ws://localhost:8080";
+        private const string RADIO_SERVER_URL = "ws://www.kafly.com.br:3000";
 
         // --- Variáveis para o Hook Global de Teclado ---
         private IntPtr _hookID = IntPtr.Zero;
@@ -104,6 +105,7 @@ namespace SkyRadio
                 my_simconnect.Dispose();
                 DisconnectRadio(); // Desconecta do servidor de rádio
                 my_simconnect = null;
+                _isInitialDataSent = false; // Reseta a flag ao desconectar
                 label_status.Text = "Connection closed";
             }
         }
@@ -201,7 +203,12 @@ namespace SkyRadio
                 _currentCom2Frequency = struct1.com2Frequency;
 
                 // Envia atualização para o servidor de rádio se os dados mudaram
-                if (dataChanged) SendDataUpdate();
+                if (!_isInitialDataSent && _ws != null && _ws.IsAlive)
+                {
+                    SendInitialData();
+                    _isInitialDataSent = true;
+                }
+                else if (dataChanged) SendDataUpdate();
             }
             else
             {
@@ -257,7 +264,7 @@ namespace SkyRadio
             {
                 this.Invoke((MethodInvoker)delegate { displayText("Rádio: Conectado"); });
                 InitializeAudio();
-                SendInitialData();
+                // SendInitialData(); // Movido para simconnect_OnRecvSimobjectDataBytype para garantir que temos dados válidos
             };
 
             _ws.OnMessage += Ws_OnMessage;

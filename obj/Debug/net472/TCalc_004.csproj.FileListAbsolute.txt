@@ -26,3 +26,4 @@ C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\bin\Debug\net472\SkyRadio.pdb
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\SkyRadio.exe
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\SkyRadio.pdb
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\SkyRadio.exe.config
+C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\bin\Debug\net472\skymetrics.ico

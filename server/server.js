@@ -2,9 +2,9 @@
 const WebSocket = require('ws');
 const http = require('http'); // Necessário para criar um servidor HTTP se você quiser servir arquivos estáticos, mas para WebSocket puro, 'ws' já basta.
 
-const wss = new WebSocket.Server({ port: 8080 });
+const wss = new WebSocket.Server({ port: 3000 });
 
-console.log('Servidor WebSocket iniciado na porta 8080');
+console.log('Servidor WebSocket iniciado na porta 3000');
 
 // Estrutura para armazenar o estado de cada cliente
 const clients = new Map(); // Map<WebSocket, { id: string, position: { lat, lon, alt }, frequency: number, isTransmitting: boolean }>
