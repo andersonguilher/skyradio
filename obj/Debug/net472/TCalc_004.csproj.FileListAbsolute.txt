@@ -25,3 +25,4 @@ C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\TCalc_004.ex
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\TCalc_004.pdb
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\TCalc_004.exe.config
 C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\bin\Debug\net472\Microsoft.FlightSimulator.SimConnect.dll
+C:\Users\ander\Downloads\radio\SkyRadio\TCalc_Code\obj\Debug\net472\TCalc_004.sourcelink.json

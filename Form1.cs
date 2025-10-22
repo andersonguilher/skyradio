@@ -19,17 +19,18 @@ namespace TCalc_004
 {
     public partial class Form1 : Form
     {
-        // --- Variáveis do Rádio ---
-        private ComboBox _inputDeviceComboBox;
-        private ComboBox _outputDeviceComboBox;
-        private CheckBox _loopbackCheckBox;
+        // --- Variáveis do Rádio ---        
         private WebSocket _ws;
         private WaveInEvent _waveIn;
         private WaveOutEvent _waveOut;
         private BufferedWaveProvider _playbackBuffer;
         private bool _isPttActive = false;
-        private const Keys PTT_KEY = Keys.Space; // Tecla PTT (Espaço)
+        private Keys _pttKey = Keys.Space; // Tecla PTT (padrão: Espaço)
         private const string RADIO_SERVER_URL = "ws://localhost:8080";
+
+        // --- Variáveis para o Hook Global de Teclado ---
+        private IntPtr _hookID = IntPtr.Zero;
+        private KeyboardHook.HookCallback _hookCallback; // Previne que o delegate seja coletado pelo GC
 
         // --- Dados Atuais da Aeronave ---
         private double _currentLatitude;
@@ -46,14 +47,18 @@ namespace TCalc_004
             // O construtor do formulário é chamado antes do InitializeComponent
             InitializeComponent();
 
-            setButtons(true, false);
+            // Inicializa componentes que não estão no designer (se necessário)
+            // O ToolTip agora é inicializado corretamente dentro do Form1.Designer.cs
 
-            InitializeAudioDeviceControls();
+            setButtons(true, false);
+            PopulateAudioDevices();
 
             // Configura a detecção de PTT no formulário
-            this.KeyPreview = true;
-            this.KeyDown += new KeyEventHandler(Form1_KeyDown);
-            this.KeyUp += new KeyEventHandler(Form1_KeyUp);
+            // this.KeyPreview = true; // Não é mais necessário com o hook global
+            // this.KeyDown += new KeyEventHandler(Form1_KeyDown); // Substituído pelo hook global
+            // this.KeyUp += new KeyEventHandler(Form1_KeyUp); // Substituído pelo hook global
+            this.FormClosed += new FormClosedEventHandler(OnFormClosed); // Garante a remoção do hook
+            SetHook(); // Instala o hook global do teclado
         }
 
         private void button_Connect_Click(object sender, EventArgs e)
@@ -124,6 +129,7 @@ namespace TCalc_004
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
             closeConnection();
+            Unhook(); // Remove o hook global do teclado ao fechar
             timer1.Enabled = false;
         }
 
@@ -202,7 +208,7 @@ namespace TCalc_004
 
         private void timer1_Tick_1(object sender, EventArgs e)
         {
-            my_simconnect.RequestDataOnSimObjectType(DATA_REQUESTS.REQUEST_1, DEFINITIONS.Struct1, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
+            my_simconnect?.RequestDataOnSimObjectType(DATA_REQUESTS.REQUEST_1, DEFINITIONS.Struct1, 0, SIMCONNECT_SIMOBJECT_TYPE.USER);
             // label_status.Text = "Request sent..."; // Opcional: pode poluir a UI
         }
 
@@ -237,26 +243,6 @@ namespace TCalc_004
         // ####################################################################
 
         #region Radio Logic
-
-        private void InitializeAudioDeviceControls()
-        {
-            // Label para o seletor de microfone
-            var inputLabel = new Label { Text = "Microfone:", Location = new Point(16, 65), Size = new Size(70, 20) };
-            this.Controls.Add(inputLabel);
-            // ComboBox para os dispositivos de captura (microfone)
-            _inputDeviceComboBox = new ComboBox { Location = new Point(90, 62), Size = new Size(320, 21), DropDownStyle = ComboBoxStyle.DropDownList };
-            this.Controls.Add(_inputDeviceComboBox);
-            // Label para o seletor de alto-falante
-            var outputLabel = new Label { Text = "Alto-falante:", Location = new Point(16, 92), Size = new Size(70, 20) };
-            this.Controls.Add(outputLabel);
-            // ComboBox para os dispositivos de reprodução (alto-falante)
-            _outputDeviceComboBox = new ComboBox { Location = new Point(90, 89), Size = new Size(320, 21), DropDownStyle = ComboBoxStyle.DropDownList };
-            this.Controls.Add(_outputDeviceComboBox);
-            // CheckBox para o teste de loopback
-            _loopbackCheckBox = new CheckBox { Text = "Teste de Loopback (áudio local)", Location = new Point(90, 116), Size = new Size(200, 20), AutoSize = true };
-            this.Controls.Add(_loopbackCheckBox);
-            PopulateAudioDevices();
-        }
 
         private void ConnectRadio()
         {
@@ -440,25 +426,103 @@ namespace TCalc_004
             return degradedBuffer;
         }
         // --- Lógica PTT ---
-        private void Form1_KeyDown(object sender, KeyEventArgs e)
+
+        private void txtPttKey_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == PTT_KEY && !_isPttActive)
-            {
-                _isPttActive = true;
-                SendJson(new { type = "ptt_start" });
-                // Opcional: Mudar cor de um label para indicar transmissão
-            }
+            e.SuppressKeyPress = true; // Impede que o caractere da tecla seja inserido no textbox
+            _pttKey = e.KeyCode;
+            txtPttKey.Text = new KeysConverter().ConvertToString(e.KeyCode);
+            this.ActiveControl = null; // Tira o foco do textbox
         }
-        private void Form1_KeyUp(object sender, KeyEventArgs e)
+
+        #region Global Keyboard Hook
+
+        private void SetHook()
         {
-            if (e.KeyCode == PTT_KEY && _isPttActive)
+            // Mantém uma referência ao delegate para que não seja coletado pelo garbage collector
+            _hookCallback = HookCallback;
+            _hookID = KeyboardHook.SetHook(_hookCallback);
+        }
+
+        private void Unhook()
+        {
+            if (_hookID != IntPtr.Zero)
             {
-                _isPttActive = false;
-                SendJson(new { type = "ptt_end" });
-                // Opcional: Voltar a cor do label ao normal
+                KeyboardHook.UnhookWindowsHookEx(_hookID);
+                _hookID = IntPtr.Zero;
             }
         }
 
+        private void OnFormClosed(object sender, FormClosedEventArgs e)
+        {
+            Unhook();
+        }
+
+        private IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam)
+        {
+            if (nCode >= 0)
+            {
+                int vkCode = Marshal.ReadInt32(lParam);
+                Keys key = (Keys)vkCode;
+
+                if (key == _pttKey)
+                {
+                    if (wParam == (IntPtr)KeyboardHook.WM_KEYDOWN || wParam == (IntPtr)KeyboardHook.WM_SYSKEYDOWN)
+                    {
+                        if (!_isPttActive)
+                        {
+                            _isPttActive = true;
+                            SendJson(new { type = "ptt_start" });
+                            // Atualiza a UI na thread principal
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                groupBox3.Text = "PTT (TRANSMITTING)";
+                                groupBox3.ForeColor = Color.Red;
+                            });
+                        }
+                    }
+                    else if (wParam == (IntPtr)KeyboardHook.WM_KEYUP || wParam == (IntPtr)KeyboardHook.WM_SYSKEYUP)
+                    {
+                        if (_isPttActive)
+                        {
+                            _isPttActive = false;
+                            SendJson(new { type = "ptt_end" });
+                            // Atualiza a UI na thread principal
+                            this.Invoke((MethodInvoker)delegate
+                            {
+                                groupBox3.Text = "PTT (Push-to-Talk)";
+                                groupBox3.ForeColor = Color.Black;
+                            });
+                        }
+                    }
+                }
+            }
+            return KeyboardHook.CallNextHookEx(_hookID, nCode, wParam, lParam);
+        }
+
         #endregion
+
+        #endregion
+    }
+
+    // Classe auxiliar para o hook de teclado
+    internal static class KeyboardHook
+    {
+        public delegate IntPtr HookCallback(int nCode, IntPtr wParam, IntPtr lParam);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr SetWindowsHookEx(int idHook, HookCallback lpfn, IntPtr hMod, uint dwThreadId);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
+
+        public const int WH_KEYBOARD_LL = 13;
+        public const int WM_KEYDOWN = 0x0100, WM_KEYUP = 0x0101, WM_SYSKEYDOWN = 0x0104, WM_SYSKEYUP = 0x0105;
+
+        public static IntPtr SetHook(HookCallback proc) => SetWindowsHookEx(WH_KEYBOARD_LL, proc, IntPtr.Zero, 0);
     }
 }
