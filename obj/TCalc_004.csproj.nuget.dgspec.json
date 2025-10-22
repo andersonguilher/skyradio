@@ -8,7 +8,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\ander\\Downloads\\radio\\SkyRadio\\TCalc_Code\\TCalc_004.csproj",
-        "projectName": "TCalc_004",
+        "projectName": "SkyRadio",
         "projectPath": "C:\\Users\\ander\\Downloads\\radio\\SkyRadio\\TCalc_Code\\TCalc_004.csproj",
         "packagesPath": "C:\\Users\\ander\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\ander\\Downloads\\radio\\SkyRadio\\TCalc_Code\\obj\\",
@@ -57,7 +57,7 @@
             },
             "NAudio": {
               "target": "Package",
-              "version": "[2.2.1, )"
+              "version": "[2.1.0, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",

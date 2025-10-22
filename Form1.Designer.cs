@@ -1,4 +1,4 @@
-namespace TCalc_004
+namespace SkyRadio
 {
     partial class Form1
     {
@@ -257,7 +257,7 @@ namespace TCalc_004
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form1";
-            this.Text = "TCalc_004";
+            this.Text = "SkyRadio";
             this.TopMost = true;
             this.groupBox1.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);

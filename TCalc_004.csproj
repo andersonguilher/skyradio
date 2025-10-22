@@ -1,11 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>World.ico</ApplicationIcon>
-    <RootNamespace>TCalc_004</RootNamespace>
-    <AssemblyName>TCalc_004</AssemblyName>
+    <UseWindowsForms>true</UseWindowsForms>    
+    <ApplicationIcon>skymetrics.ico</ApplicationIcon>
+    <RootNamespace>SkyRadio</RootNamespace>
+    <AssemblyName>SkyRadio</AssemblyName>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
@@ -21,7 +22,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="NAudio" Version="2.1.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="WebSocketSharp-netstandard" Version="1.0.1" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -30,5 +31,8 @@
     <Content Include=".\SimConnect.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="skymetrics.ico" />
   </ItemGroup>
 </Project>

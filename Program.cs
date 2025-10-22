@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 
-namespace TCalc_004
+namespace SkyRadio
 {
     static class Program
     {

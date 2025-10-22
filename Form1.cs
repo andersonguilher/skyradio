@@ -15,7 +15,7 @@ using WebSocketSharp;
 using Newtonsoft.Json;
 using System.Threading;
 
-namespace TCalc_004
+namespace SkyRadio
 {
     public partial class Form1 : Form
     {
@@ -46,6 +46,9 @@ namespace TCalc_004
         {
             // O construtor do formulário é chamado antes do InitializeComponent
             InitializeComponent();
+
+            // Define o ícone da janela e da barra de tarefas
+            this.Icon = new System.Drawing.Icon("skymetrics.ico");
 
             // Inicializa componentes que não estão no designer (se necessário)
             // O ToolTip agora é inicializado corretamente dentro do Form1.Designer.cs
