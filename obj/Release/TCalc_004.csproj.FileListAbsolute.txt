@@ -1,0 +1,14 @@
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\Form1.cs
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\Form1.Designer.cs
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\TCalc_004.exe.config
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\TCalc_004.exe
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\TCalc_004.pdb
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\Microsoft.FlightSimulator.SimConnect.dll
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.Form1.resources
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.Properties.Resources.resources
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.csproj.GenerateResource.cache
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.csproj.CoreCompileInputs.cache
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.csproj.CopyComplete
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.exe
+C:\Users\dickl\Desktop\TCalc_Code\obj\Release\TCalc_004.pdb
+C:\Users\dickl\Desktop\TCalc_Code\bin\Release\SimConnect.dll
